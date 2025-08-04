@@ -1,3 +1,14 @@
+Add Python inline dependency of just "modal" above
+
+```py
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "modal",
+# ]
+# ///
+```
+
 Modal volume is remote.
 
 ```py
@@ -32,9 +43,17 @@ We can also add library only for the remote server without installing it locally
 # import pandas as pd
 # import numpy as np
 
-with app.imports():
+modal_image = (
+    modal.Image.debian_slim(python_version="3.12")
+    .apt_install("libgdal-dev")
+    .uv_pip_install("pandas", "numpy")
+)
+
+with modal_image.imports():
     import pandas as pd
     import numpy as np
+
+app = modal.App(name="modal-app-name", image=modal_image)
 ```
 
 
@@ -71,7 +90,7 @@ And ONLY IF the files or computations are possibly large, we can reserve resourc
     volumes={
         mount_path: modal_volume,
     },
-    timeout=1 * 60 * 60,
+    timeout=1 * 60 * 60, # 1 hour
     memory=1024 * 8, # 8 GB RAM 
     cpu=2, # 2 CPUs
     gpu="A10G" 
