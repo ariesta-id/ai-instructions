@@ -49,6 +49,7 @@ modal_image = (
     .uv_pip_install("pandas", "numpy")
 )
 
+# Important, .imports() is the image's method, not app
 with modal_image.imports():
     import pandas as pd
     import numpy as np
@@ -83,6 +84,8 @@ def remote_function(x, y, z):
     modal_volume.commit() # after done writing files
 ```
 
+Note that the volume `commit()` is done within the @app.function. 
+
 And ONLY IF the files or computations are possibly large, we can reserve resources like this:
 
 ```py
@@ -97,20 +100,24 @@ And ONLY IF the files or computations are possibly large, we can reserve resourc
 )
 ```
 
-The following is the local entry point. 
+The following is the local entry point.
 
 ```py
 @app.local_entrypoint()
 def main():
     remote_function.remote(1,2,3)
+```
 
+It is important to call the local_entrypoint using modal.enable_output.
+
+```py
 if __name__ == "__main__":
     with modal.enable_output():
         with app.run(detach=False): # detach=True to keep running even if disconnect 
             main()
 ```
 
-Besides `.remote` there is also `.map` and `.starmap`. `.map` is used if a function only accepts 1 parameter. Modal's `.map()` is different from Python's `map()`.
+Besides `.remote` there is also `.map` and `.starmap`. `.map` is used if a function only accepts 1 parameter. Modal's `.map()` is different from Python's `map()`. IMPORTANT: The function that is being called using `.map` or `.starmap` has to be "consumed", i.e. using `list(the_function.map(parameters))`
 
 ```py
 @app.function()
