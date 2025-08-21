@@ -1,4 +1,7 @@
-Script example of LLM inference using replicate.com platform
+Script example of LLM inference using replicate.com platform.
+
+Please strictly follow the model type, which is "openai/gpt-5" (yes, it's already there).
+And follow the other parameters value provided in the example: "max_completion_tokens", "reasoning_effort"
 
 ```py
 # /// script
